@@ -1,0 +1,129 @@
+{% extends "navigation.html" %}
+
+{% block contenido %}
+
+    <div id="dvFlash" style="font-weight: bold;">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-primary" role="alert">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col col-md-9 col-lg-7 col-xl-5">
+            <div class="card" style="border-radius: 15px;">
+                <div class="card-body p-4">
+                    <div class="d-flex text-black">
+                        <div class="flex-shrink-0">
+                            {% if user.profile_image %}
+                                <img src="{{ url_for("users.get_image", user_oid = user_oid) }}"
+                                     class="bd-placeholder-img rounded-circle" width="150" height="150"
+                                     class="bi bi-person-circle" alt="...">
+                            {% else %}
+                                <svg xmlns="http://www.w3.org/2000/svg" role="img" width="150" height="150"
+                                     fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                                    <path fill-rule="evenodd"
+                                          d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                                </svg>
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1 ms-3 pt-3">
+                            <h6 class="mb-1">Usuario: {{ user.username }}</h6>
+                            <h6 class="mb-1">Correo electrónico: {{ user.email }}</h6>
+                            <div class="d-flex justify-content-start rounded-3 p-2 my-3"
+                                 style="background-color: #efefef;">
+                                <div class="px-3">
+                                    <p class="small text-muted mb-1">Seguidores</p>
+                                    <p class="mb-0">{{ user.num_followers }}</p>
+                                </div>
+                                <div>
+                                    <p class="small text-muted mb-1">Seguidos</p>
+                                    <p class="mb-0">{{ user.num_following() }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container d-flex justify-content-center align-items-center h-100 py-5"
+    <div class="btn-group py-2">
+        {% if current_user.__oid__ == user.__oid__ %}
+            <a href="/user/modify-profile-image" class="btn btn-sm btn-outline-primary">Cambiar foto de perfil</a>
+            <a href="/user/modify-password" class="btn btn-sm btn-outline-primary">Cambiar contraseña</a>
+            <a href="/user/delete" class="btn btn-sm btn-outline-primary">Eliminar perfil</a>
+        {% else %}
+
+            {% if user.__oid__ in current_user.following_oids %}
+
+                <div class="d-flex btn-group py-2">
+                    <a href="{{ url_for("users.unfollow_user", user_oid = user_oid) }}" class="btn btn-sm btn-primary"
+                       aria-selected="true">Seguido</a>
+                </div>
+
+            {% else %}
+                <div class="d-flex btn-group py-2">
+                    <a href="{{ url_for("users.follow_user", user_oid = user_oid) }}"
+                       class="btn btn-sm btn-outline-primary">Seguir</a>
+                </div>
+
+            {% endif %}
+
+        {% endif %}
+    </div>
+
+
+    </div>
+
+    <div class="album py-5 bg-light">
+
+
+        <div class="container">
+
+            {% if posts_list %}
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+
+                    {% for post in posts_list %}
+
+                        <div class="col">
+
+                            <div class="card" style="width: 25rem;">
+                                <img src="{{ url_for("posts.get_image", post_oid = posts_oids[post.__oid__]) }}"
+                                     class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ user.username }}</h5>
+                                    <p class="card-text">{{ post.time }}</p>
+                                    <p class="card-text">{{ post.message }}</p>
+                                    <div class="btn-group">
+                                        <a href="{{ url_for("posts.view_comments", post_oid = posts_oids[post.__oid__]) }}"
+                                           class="btn btn-sm btn-outline-secondary">Ver comentarios</a>
+                                        {% if current_user %}
+                                            <a href="{{ url_for("posts.modify_post", post_oid = posts_oids[post.__oid__]) }}"
+                                               class="btn btn-sm btn-outline-secondary">Modificar</a>
+                                            <a href="{{ url_for("posts.delete_post", post_oid = posts_oids[post.__oid__]) }}"
+                                               class="btn btn-sm btn-outline-secondary">Eliminar</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+
+
+            {% else %}
+                <p><b>No hay publicaciones disponibles en este momento.</b></p>
+            {% endif %}
+        </div>
+
+    </div>
+{% endblock %}

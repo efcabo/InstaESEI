@@ -1,0 +1,54 @@
+{% extends "navigation.html" %}
+
+{% block contenido %}
+
+    <div id="dvFlash" style="font-weight: bold;">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-primary" role="alert">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="album py-5 bg-light">
+        <div class="container">
+
+            {% if posts_list %}
+                <div class="row row-cols-1 row-cols-md-3 g-3">
+
+                    {% for post in posts_list %}
+                        <div class="col">
+
+                            <div class="card" style="width: 25rem;">
+                                <img src="{{ url_for("posts.get_image", post_oid = posts_oids[post.__oid__]) }}"
+                                     class="card-img-top" alt="...">
+
+                                <div class="card-body">
+                                    <a href="{{ url_for("users.view_profile", user_oid = users_oids[post.__oid__]) }}">
+                                        <h5 class="card-title">{{ users_list[post.__oid__].username }}</h5></a>
+                                    <p class="card-text">{{ post.time }}</p>
+                                    <p class="card-text">{{ post.message }}</p>
+
+                                    <div class="btn-group">
+                                        <a href="{{ url_for("posts.view_comments", post_oid = posts_oids[post.__oid__]) }}"
+                                           class="btn btn-sm btn-outline-secondary">Ver comentarios</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+            {% else %}
+                <p><b>No hay publicaciones disponibles en este momento.</b></p>
+                <p><b>Puedes buscar nuevos usuarios o publicar nuevo contenido desde el menú.</b></p>
+            {% endif %}
+
+        </div>
+
+    </div>
+{% endblock %}
